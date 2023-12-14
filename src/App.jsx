@@ -1,20 +1,26 @@
-import React, { useState } from 'react';
-import { Document, Page } from 'react-pdf';
-import { pdfjs } from 'react-pdf';
-import './App.css';
+import React, { useState } from "react";
+import {
+  ArrowDown,
+  ChevronLeft,
+  ChevronRight,
+  ZoomIn,
+  ZoomOut,
+} from "react-feather";
+import { Document, Page } from "react-pdf";
+import { pdfjs } from "react-pdf";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.js',
-  import.meta.url,
+  "pdfjs-dist/build/pdf.worker.min.js",
+  import.meta.url
 ).toString();
 
 function App() {
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
-  const [scale, setScale] = useState(1.0); // Initial scale
+  const [scale, setScale] = useState(1.0);
+  const [pdfFilePath, setPdfFilePath] = useState("/public/test.pdf");
 
   function onDocumentLoadSuccess({ numPages }) {
-    console.log('numPages', numPages);
     setNumPages(numPages);
     setPageNumber(1);
   }
@@ -32,11 +38,10 @@ function App() {
   }
 
   function handleDownload() {
-    // Replace '/everything.pdf' with the correct path to your PDF file
-    const pdfPath = '/everything.pdf';
-    const link = document.createElement('a');
+    const pdfPath = pdfFilePath;
+    const link = document.createElement("a");
     link.href = pdfPath;
-    link.download = 'downloaded.pdf';
+    link.download = "downloaded.pdf";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -51,28 +56,75 @@ function App() {
   }
 
   return (
-    <div style={{border: "1px solid black", paddingBottom: "", height: "600px"}}>
-       <div>
-       
-        <div style={{backgroundColor: "#c6cfc8"}}>
-        <span onClick={changePageBack}>Previous</span>
-        <span>Page {pageNumber} of {numPages}</span>
-        <span onClick={changePageNext}>Next</span>
-        
-       <span onClick={handleDownload}>D</span>
-        <span onClick={handleZoomIn}>In</span>
-        <span onClick={handleZoomOut}>Out</span>
-       </div>
-       </div>
-       <div>
-       <Document file="/everything.pdf" onLoadSuccess={onDocumentLoadSuccess}>
-          <Page height={600} pageNumber={pageNumber} scale={scale} />
-        </Document>
-       </div>
-     
-   
+    <div
+      style={{
+        display: "flex",
+        width: "100vw",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <div
+        style={{
+          minWidth: "30%",
+          margin: "auto",
+          height: "100vh",
+        }}
+      >
+        <div
+          style={{
+            backgroundColor: "#c6cfc8",
+            // padding: "10px",
+            border: "1px solid black",
+          }}
+        >
+          <div className="d-flex justify-content-between">
+            <div>
+              <span className="btn cursor-pointer" onClick={changePageBack}>
+                <ChevronLeft />
+              </span>
+              <span>
+                Page {pageNumber} of {numPages}
+              </span>
+              <span className="btn cursor-pointer" onClick={changePageNext}>
+                <ChevronRight />
+              </span>
+            </div>
+
+            <div>
+              <span className="btn cursor-pointer" onClick={handleDownload}>
+                <ArrowDown />
+              </span>
+              <span className="btn cursor-pointer" onClick={handleZoomIn}>
+                <ZoomIn />
+              </span>
+              <span className="btn cursor-pointer" onClick={handleZoomOut}>
+                <ZoomOut />
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          style={{
+            border: "1px solid black",
+            height: "90vh",
+          }}
+        >
+          <Document file={pdfFilePath} onLoadSuccess={onDocumentLoadSuccess}>
+            <Page
+              height={780}
+              pageNumber={pageNumber}
+              scale={scale}
+              renderTextLayer={false}
+              renderAnnotationLayer={false}
+              customTextRenderer={false}
+            />
+          </Document>
+        </div>
+      </div>
     </div>
   );
 }
 
-export default App
+export default App;
