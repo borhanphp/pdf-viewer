@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   ArrowDown,
   ChevronLeft,
@@ -19,6 +19,7 @@ function App() {
   const [pageNumber, setPageNumber] = useState(1);
   const [scale, setScale] = useState(1.0);
   const [pdfFilePath, setPdfFilePath] = useState("/public/test.pdf");
+  const pdfWrapperRef = useRef(null);
 
   function onDocumentLoadSuccess({ numPages }) {
     setNumPages(numPages);
@@ -55,67 +56,74 @@ function App() {
     setScale((prevScale) => Math.max(0.2, prevScale - 0.2));
   }
 
+  const pdfContainerStyle = {
+    border: "1px solid black",
+    width: "400px", // Adjusted width as per your requirement
+    height: "600px", // Adjusted height as per your requirement
+    overflow: "auto", // Prevent content from overflowing the container
+  };
+
+  const pdfContentStyle = {
+    transform: `scale(${scale})`, // Apply scale to the content container
+    transformOrigin: "0 0", // Set the transform origin to the top-left corner
+  };
+
   return (
     <div
       style={{
         display: "flex",
-        width: "100vw",
+        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
+        height: "100vh",
+        width: "100vw"
       }}
     >
       <div
         style={{
-          minWidth: "30%",
-          margin: "auto",
-          height: "100vh",
+          width: "100%",
+          backgroundColor: "#c6cfc8",
+          padding: "0px",
+          borderBottom: "1px solid black",
+          display: "flex",
+          justifyContent: "space-between",
+          position: "sticky",
+          top: 0,
+          zIndex: 1,
         }}
       >
-        <div
-          style={{
-            backgroundColor: "#c6cfc8",
-            // padding: "10px",
-            border: "1px solid black",
-          }}
-        >
-          <div className="d-flex justify-content-between">
-            <div>
-              <span className="btn cursor-pointer" onClick={changePageBack}>
-                <ChevronLeft />
-              </span>
-              <span>
-                Page {pageNumber} of {numPages}
-              </span>
-              <span className="btn cursor-pointer" onClick={changePageNext}>
-                <ChevronRight />
-              </span>
-            </div>
-
-            <div>
-              <span className="btn cursor-pointer" onClick={handleDownload}>
-                <ArrowDown />
-              </span>
-              <span className="btn cursor-pointer" onClick={handleZoomIn}>
-                <ZoomIn />
-              </span>
-              <span className="btn cursor-pointer" onClick={handleZoomOut}>
-                <ZoomOut />
-              </span>
-            </div>
-          </div>
+        <div>
+          <span className="btn cursor-pointer" onClick={changePageBack}>
+            <ChevronLeft />
+          </span>
+          <span>
+            Page {pageNumber} of {numPages}
+          </span>
+          <span className="btn cursor-pointer" onClick={changePageNext}>
+            <ChevronRight />
+          </span>
         </div>
 
-        <div
-          style={{
-            border: "1px solid black",
-            height: "90vh",
-          }}
-        >
+        <div>
+          <span className="btn cursor-pointer" onClick={handleDownload}>
+            <ArrowDown />
+          </span>
+          <span className="btn cursor-pointer" onClick={handleZoomIn}>
+            <ZoomIn />
+          </span>
+          <span className="btn cursor-pointer" onClick={handleZoomOut}>
+            <ZoomOut />
+          </span>
+        </div>
+      </div>
+
+      <div ref={pdfWrapperRef} style={pdfContainerStyle}>
+        <div style={pdfContentStyle}>
           <Document file={pdfFilePath} onLoadSuccess={onDocumentLoadSuccess}>
             <Page
-              height={780}
+              width={400} // Adjusted width as per your requirement
+              height={600} // Adjusted height as per your requirement
               pageNumber={pageNumber}
-              scale={scale}
               renderTextLayer={false}
               renderAnnotationLayer={false}
               customTextRenderer={false}
